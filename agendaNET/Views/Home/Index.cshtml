@@ -1,0 +1,205 @@
+﻿@using agendaNET.Models;
+@{
+    ViewBag.Title = "Home Page";
+    List<Eventos> eventos = (List<Eventos>)ViewData["DadosConsulta"];
+}
+
+@using (Html.BeginForm("Index", "Home", FormMethod.Post))
+{
+    <div class="form-horizontal">
+        <hr />
+        <div class="form-group">
+            <h4>Buscar:</h4>
+            <input type="text" class="form-group" name="campoBusca" id="campoBusca">
+            <button class="btn btn-primary" type="submit" id="idEvento">
+                Buscar
+            </button>
+        </div>
+
+
+
+
+
+
+    </div>
+}
+
+
+<table class="table table-hover">
+    <thead>
+        <!--COLUNAS-->
+        <tr>
+            <th scope="col">ID</th>
+            <th scope="col">Nome do Evento</th>
+            <th scope="col">Descrição</th>
+            <th scope="col">Data</th>
+            <th scope="col">Local</th>
+            <th scope="col">Participantes</th>
+            <th scope="col">Tipo</th>
+            <th scope="col">Criador</th>
+        </tr>
+    </thead>
+    <tbody>
+        <!--LINHAS-->
+        @{ int i = 0;}
+
+        @foreach (var dados in eventos)
+        {
+
+            <tr>
+                <td> @dados.idEventos </td>
+                <td> @dados.NomeEvento </td>
+                <td> @dados.descrição </td>
+                <td> @dados.Data </td>
+                <td> @dados.local </td>
+                <td>  @dados.participantes </td>
+                <td> @dados.Tipo </td>
+                <td> @dados.criadorEvento </td>
+                <td>
+                    <button class="btn btn-primary" type="button" id="idEvento" value="@dados.idEventos" onclick="editEvento(@dados.idEventos)" data-toggle="collapse" data-target="#collapseExample_0" aria-expanded="false" aria-controls="collapseExample">
+                        Editar
+                    </button>
+                </td>
+            </tr>
+            i++;
+        }
+
+
+
+
+    </tbody>
+
+   
+        <div class="collapse" id="collapseExample_0">
+
+            @using (Html.BeginForm("editarEvento", "Home"))
+            {
+                <div class="well">
+                    <input type="text" id="txtEditAuth" name="txtEditAuth" maxlength="1" hidden />
+                    
+                    <input type="text" id="idEventos" name="idEventos" hidden />
+
+
+
+
+                    <div class="form-group">
+                        <label>Nome do evento:</label>
+                        <input type="text" id="txtNomeEvento" name="NomeEvento" maxlength="100" />
+                    </div>
+
+
+                    <div class="form-group">
+                        <label>Descrição:</label>
+                        <input type="text" name="descrição" id="txtDescricao" maxlength="100" />
+                    </div>
+
+                    <div class="form-group">
+
+                        <label>Data:</label>
+                        <input type="text" onkeydown="mascaraData(this, event)" id="txtDataEvento" name="Data" maxlength="10" />
+
+
+                        <label>Local:</label>
+                        <input type="text" name="local" id="txtLocal" maxlength="100" />
+                    </div>
+
+                    <div class="form-group">
+                        <label>Participantes:</label>
+                        <input type="number" name="participantes" id="txtParticipantes" />
+                    </div>
+
+                    <div class="form-group">
+                        <label>Tipo do Evento:</label>
+                        <select class="form-select" name="Tipo" id="opTipo" aria-label="Default select example">
+                            <option value="Compartilhado" selected>Compartilhado</option>
+                            <option value="Exclusivo">Exclusivo</option>
+                        </select>
+                    </div>
+
+
+                    <div class="col-lg-offset-2">
+                        <button class="btn btn-dark" type="submit">Salvar</button>
+                    </div>
+
+                </div>
+            }
+        </div>
+
+    
+
+
+</table>
+<button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#collapseExample_0" aria-expanded="false" aria-controls="collapseExample">
+    Novo
+</button>
+
+<script type="text/javascript">
+
+
+        function editEvento(idEvento) {
+
+            // var numeroId = $("#numeroId").val();
+           // var numeroId = $(this).data('numeroId');
+
+             $.ajax({
+                 type: 'get',
+                 contentType: "application/json;charset=utf-8",
+                 url: '@Url.Action("buscaEditEvento", "Home")',
+                 data: "numeroId=" + idEvento,
+                 dataType: 'json',
+                                  success: function (retorno) {
+
+                     console.log(retorno.PES_Nome);
+                                      $("#idEventos").val(retorno.retorno.idEventos);
+                                      $("#txtNomeEvento").val(retorno.retorno.NomeEvento);
+                                      $("#txtDescricao").val(retorno.retorno.descrição);
+                                      $("#txtDataEvento").val(retorno.retorno.Data);
+                                      $("#txtLocal").val(retorno.retorno.local);
+                                      $("#txtParticipantes").prop('value', retorno.retorno.participantes);
+                                      $("#opTipo").val(retorno.retorno.Tipo);
+
+
+                 }
+             });
+    }
+
+    function buscaEvento() {
+
+             var idEvento = $("#campoBusca").val();
+           // var numeroId = $(this).data('numeroId');
+
+             $.ajax({
+                 type: 'get',
+                 contentType: "application/json;charset=utf-8",
+                 url: '@Url.Action("buscaEvento", "Home")',
+                 data: "nomeEvento=" + idEvento
+
+                 /*,
+                 dataType: 'json',
+                                  success: function (retorno) {
+
+                     console.log(retorno.PES_Nome);
+                                      $("#idEventos").val(retorno.retorno.idEventos);
+                                      $("#txtNomeEvento").val(retorno.retorno.NomeEvento);
+                                      $("#txtDescricao").val(retorno.retorno.descrição);
+                                      $("#txtDataEvento").val(retorno.retorno.Data);
+                                      $("#txtLocal").val(retorno.retorno.local);
+                                      $("#txtParticipantes").prop('value', retorno.retorno.participantes);
+                                      $("#opTipo").val(retorno.retorno.Tipo);}*/
+
+
+
+             });
+        }
+
+    function mascaraData(campo, e) {
+        var kC = (document.all) ? event.keyCode : e.keyCode;
+        var data = campo.value;
+
+        if (kC != 8 && kC != 46) {
+            if (data.length == 2) { campo.value = data += '/'; }
+            else if (data.length == 5) { campo.value = data += '/'; }
+            else campo.value = data;
+        }
+    }
+</script>
